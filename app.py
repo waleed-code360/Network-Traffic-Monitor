@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
-from scapy.all import sniff, IP, TCP, UDP, ICMP
+from scapy.all import sniff, IP, TCP, UDP, ICMP, conf
 import threading
 import datetime
 
@@ -32,7 +32,6 @@ def process_packet(packet):
     src_port = 0
     dst_port = 0
     service = "Unknown"
-
     ip_proto = packet[IP].proto
 
     if ip_proto == 1:
@@ -92,6 +91,12 @@ def stop():
     global is_monitoring
     is_monitoring = False
     return jsonify({"status": "stopped"})
+
+@app.route("/clear", methods=["POST"])
+def clear():
+    global packets_list
+    packets_list = []
+    return jsonify({"status": "cleared"})
 
 @app.route("/packets")
 def get_packets():
